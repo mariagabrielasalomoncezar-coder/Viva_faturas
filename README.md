@@ -1,111 +1,62 @@
-# Viva Connecta — Site institucional
+# Viva Conecta · Central de Faturamento (Redesign Executivo)
 
-Site institucional da **Viva Connecta**, parceira Vivo Empresas em Guarulhos – SP.
-Construído com **Next.js 14 (App Router) + React + TypeScript + Tailwind CSS**, pronto para deploy na **Vercel**.
+Versão atualizada em 28/10/2026 — interface redesenhada para operação financeira. Veja `CHANGELOG_VISUAL.md` para detalhes. Aplicação independente em Next.js, Supabase e Vercel.
 
-## 1. Pré-requisitos
+## Estado do projeto
 
-- [Node.js](https://nodejs.org) 18.18 ou superior (recomendado: 20 LTS)
-- npm (já vem junto com o Node.js)
+- Novo banco Supabase **`viva-conecta-central-faturamento`** já configurado em seu próprio projeto.
+- **2.045 clientes reais**, **2.058 vínculos de vencimento** e dados de contato disponíveis já importados diretamente no Supabase novo.
+- **228 clientes com e-mail** e **189 com WhatsApp identificado**; revise os contatos antes de enviar faturas.
+- Um usuário administrador já possui perfil na tabela `profiles` (credenciais gerenciadas apenas no Supabase Auth).
+- **Nenhum e-mail foi enviado** e nenhuma fatura foi marcada como enviada; todos os indicadores começam do zero.
+- Status de pagamento não é obtido automaticamente: não existe integração com CRM ou Simplifique.
 
-Para conferir se já tem o Node instalado, abra o terminal e rode:
+## Aparência / recursos
 
-```bash
-node -v
+- Design premium roxo e branco com menu lateral escuro, hero, indicadores, gráfico de progresso, grupos de vencimento, tabelas e filtros.
+- Três carteiras: `03-05-08`, `10-13-15-17` e `21-25-28`, com status de envio por competência.
+- Pesquisa por nome, CNPJ ou e-mail; painel da empresa, contatos editáveis, histórico e datas para conferir.
+- Upload de PDF até 10 MB em bucket privado; serviço de e-mail Resend com confirmação humana.
+- WhatsApp manual com mensagem padrão de disponibilidade ou cobrança e botão de registro (nunca dispara automaticamente).
+- Importação JSON privada e idempotente, sem excluir clientes ou reverter envios já feitos.
+
+## Publicar a nova interface no Vercel
+
+No projeto Vercel existente `viva_faturas` publique os arquivos **dentro da pasta `viva-central-faturamento`** do ZIP. Não crie outro Supabase e não rode novamente o script SQL no projeto antigo.
+
+As variáveis de ambiente já cadastradas no Vercel são:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://spepelsnsndmrkzqsjvk.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave pública do novo Supabase já cadastrada no Vercel>
 ```
 
-## 2. Instalar as dependências
+Atenção: os nomes das variáveis devem corresponder exatamente aos usados pelo código. Após subir o ZIP, faça um novo Deployment para que o visual atualizado seja publicado.
 
-Dentro da pasta do projeto, rode:
+## E-mail real
 
-```bash
-npm install
+Sem os dois valores abaixo, o botão de envio acusa configuração pendente, mesmo que a interface esteja funcionando:
+
+```env
+RESEND_API_KEY=<segredo somente no servidor>
+EMAIL_FROM="Viva Conecta <faturas@dominio-verificado-da-viva.com.br>"
 ```
 
-## 3. Rodar localmente
+Configure um domínio próprio e verificado no Resend, cadastro de remetente e um endereço de retorno apropriado. **Nunca adicione a chave secreta ao GitHub, ao frontend ou ao arquivo `.env.example`.**
 
-```bash
-npm run dev
-```
+## Privacidade / operação
 
-Abra [http://localhost:3000](http://localhost:3000) no navegador. O site recarrega
-automaticamente a cada alteração salva.
+- O ZIP entregue contém **código, sem cadastros reais**. Os clientes já estão no Supabase privado e o JSON fica em arquivo separado.
+- Não coloque o JSON real dos clientes em repositório público. O script de importação é apenas para atualizações futuras.
+- Não envie automaticamente. Revise o destinatário, PDF, competência e vencimento antes do primeiro teste.
+- O envio aceito pelo Resend não garante leitura ou entrega final ao destinatário.
+- CAR, conciliação bancária e cobrança automática ficam para futuras versões.
+- **O projeto antigo BKO/Genesys/Dashboard não foi alterado.**
 
-## 4. Gerar a versão de produção (opcional, para testar antes do deploy)
+## Testes
 
-```bash
-npm run build
-npm run start
-```
-
-## 5. Publicar na Vercel
-
-**Opção A — pelo site da Vercel (mais simples):**
-
-1. Suba este projeto para um repositório no GitHub (ou GitLab/Bitbucket).
-2. Acesse [vercel.com](https://vercel.com) e faça login.
-3. Clique em **"Add New… → Project"** e selecione o repositório.
-4. A Vercel detecta automaticamente que é um projeto Next.js — não é
-   necessário configurar nada manualmente.
-5. Clique em **Deploy** e aguarde. Em poucos minutos o site estará no ar.
-
-**Opção B — pela CLI da Vercel:**
-
-```bash
-npm install -g vercel
-vercel login
-vercel
-```
-
-Siga as instruções no terminal. Para publicar a versão final (produção):
-
-```bash
-vercel --prod
-```
-
-## 6. Onde alterar os dados da empresa
-
-Todos os dados oficiais (WhatsApp, Instagram, endereço, links do menu) ficam
-centralizados em um único arquivo:
-
-```
-lib/config.ts
-```
-
-Para trocar o número de WhatsApp, o Instagram, o endereço ou qualquer outro
-dado de contato, basta editar os valores nesse arquivo — eles são usados
-automaticamente em todo o site (cabeçalho, hero, seções, rodapé e botão
-flutuante).
-
-> ⚠️ O único número de WhatsApp usado em todo o projeto é o oficial da Viva
-> Connecta: **+55 11 91787-0756**. Nenhum outro número foi utilizado.
-
-## 7. Estrutura do projeto
-
-```
-app/                 Páginas, layout, metadados de SEO e sitemap
-components/          Seções e componentes visuais do site
-components/icons/    Ícones SVG usados no projeto (WhatsApp, Instagram)
-lib/config.ts        Configuração central dos dados da empresa
-public/               Favicon e robots.txt
-```
-
-## 8. Formulário de contato
-
-O site ainda não possui um backend próprio para o formulário de contato. Para
-mantê-lo funcional sem inventar uma integração inexistente, ao clicar em
-**"Enviar mensagem"** os dados preenchidos são usados para montar uma
-mensagem que abre diretamente uma conversa no WhatsApp oficial da Viva
-Connecta. Quando houver uma integração futura (por exemplo, um serviço de
-e-mail ou uma API própria), essa lógica pode ser substituída no arquivo
-`components/Contact.tsx`, na função `handleSubmit`.
-
-## 9. Checklist de verificação já realizado
-
-- [x] Único número de WhatsApp em todo o projeto: **+55 11 91787-0756**
-- [x] Instagram oficial: **@vivaconectabr**
-- [x] Endereço conforme informado (Av. Tiradentes, 2180 – 1º andar, Guarulhos – SP, CEP 07090-000)
-- [x] Menu mobile funcional, com abertura/fechamento e rolagem até a seção
-- [x] Botão flutuante do WhatsApp em todas as telas
-- [x] SEO: title, description, Open Graph, favicon, sitemap.xml, robots.txt, dados estruturados (JSON-LD) de negócio local
-- [x] Layout responsivo (mobile, tablet, notebook, desktop)
+1. Acesse `https://vivafaturas.vercel.app` e entre com o usuário já criado no Supabase novo.
+2. Confira Dashboard e os 3 grupos com 2.045 cadastros únicos e 2.058 vínculos.
+3. Abra um cliente de teste, confira e-mail e vencimento e anexe um PDF de teste.
+4. Configure Resend e envie **somente para um endereço de teste autorizado**.
+5. Confira o log e o indicador mensal, e verifique que a mudança de competência não apaga o histórico anterior.
